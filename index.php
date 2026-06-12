@@ -37,7 +37,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Available Tests</h5>
@@ -60,14 +60,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Console Log</h5>
-                </div>
+        <div class="col-md-8">
+                
                 <div class="card-body bg-dark text-white" id="consoleLog" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
                     <div>System ready...</div>
-                </div>
+                </div></div>
             </div>
         </div>
     </div>

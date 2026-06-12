@@ -14,12 +14,23 @@ class WebScanner {
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $html = curl_exec($ch);
+        curl_setopt($ch, CURLOPT_HEADER, true); // Include headers in the output
+        $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $headers = curl_getinfo($ch, CURLINFO_HEADER);
+        
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new Exception("Curl error: $error");
+        }
+
+        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $headers = substr($response, 0, $headerSize);
+        $html = substr($response, $headerSize);
+        
         curl_close($ch);
 
-        if ($html === false || $httpCode >= 400) {
+        if ($httpCode >= 400) {
             throw new Exception("Failed to fetch URL (HTTP Code: $httpCode)");
         }
 
@@ -41,14 +52,12 @@ class WebScanner {
 
     public function testBrokenLinks() {
         list($html) = $this->fetchHtml();
-        // Simple regex for links
         preg_match_all('/href=["\'](https?:\/\/[^"\']+)["\']/i', $html, $matches);
         $links = array_unique($matches[1]);
         
-        $brokenCount = 0;
+        $brokenLinks = [];
         $totalCount = count($links);
         
-        // Only check first 5 for demo speed
         $linksToTest = array_slice($links, 0, 5);
         $checked = 0;
 
@@ -63,12 +72,16 @@ class WebScanner {
             curl_close($ch);
 
             if ($code >= 400) {
-                $brokenCount++;
+                $brokenLinks[] = $link;
             }
             $checked++;
         }
 
-        return "Checked $checked links. Broken: $brokenCount";
+        $result = "Checked $checked links. Broken: " . count($brokenLinks);
+        if (!empty($brokenLinks)) {
+            $result .= " URLs: " . implode(', ', $brokenLinks);
+        }
+        return $result;
     }
 
     public function testSeoTags() {
@@ -91,15 +104,7 @@ class WebScanner {
     }
 
     public function testSecurityHeaders() {
-        $ch = curl_init($this->url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $response = curl_exec($ch);
-        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $headers = substr($response, 0, $headerSize);
-        curl_close($ch);
+        list(, , $headers) = $this->fetchHtml();
 
         $importantHeaders = [
             'X-Frame-Options',

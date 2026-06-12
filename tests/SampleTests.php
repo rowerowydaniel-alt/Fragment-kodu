@@ -11,12 +11,12 @@ class SampleTests {
 
     public function divideByZero($a, $b) {
         if ($b == 0) {
-            throw new Exception("Division by zero!");
+            throw new Exception("Division by zero");
         }
         return $a / $b;
     }
 
-    public function checkString($str, $expected) {
-        return $str === $expected;
+    public function checkString($str1, $str2) {
+        return $str1 === $str2;
     }
 }

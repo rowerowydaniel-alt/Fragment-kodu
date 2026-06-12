@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../tests/SampleTests.php';
+require_once __DIR__ . '/WebScanner.php';
 
 header('Content-Type: application/json');
 
@@ -77,7 +78,7 @@ if ($action === 'run') {
                 try {
                     $tester->divideByZero(10, 0);
                 } catch (Exception $e) {
-                    $result = 'caught error'; 
+                    $result = 'caught error';
                     if ($result !== 'caught error') throw new Exception("Failed to catch exception");
                 }
                 break;
@@ -100,5 +101,52 @@ if ($action === 'run') {
     exit;
 }
 
+if ($action === 'scan') {
+    // CSRF Protection
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Invalid CSRF token']);
+        exit;
+    }
+
+    $url = $_POST['url'] ?? '';
+    $testType = $_POST['test_type'] ?? '';
+
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        echo json_encode(['error' => 'Invalid URL provided']);
+        exit;
+    }
+
+    $scanner = new WebScanner($url);
+    $resultMessage = '';
+    $resultStatus = 'passed';
+
+    try {
+        switch ($testType) {
+            case 'html_elements':
+                $resultMessage = $scanner->testHtmlElements();
+                break;
+            case 'broken_links':
+                $resultMessage = $scanner->testBrokenLinks();
+                break;
+            case 'seo_tags':
+                $resultMessage = $scanner->testSeoTags();
+                break;
+            case 'security_headers':
+                $resultMessage = $scanner->testSecurityHeaders();
+                break;
+            default:
+                throw new Exception("Unknown scan type: $testType");
+        }
+    } catch (Exception $e) {
+        $resultStatus = 'failed';
+        $resultMessage = $e->getMessage();
+    }
+
+    echo json_encode(['status' => $resultStatus, 'message' => $resultMessage]);
+    exit;
+}
+
 echo json_encode(['error' => 'Invalid action']);
+
 

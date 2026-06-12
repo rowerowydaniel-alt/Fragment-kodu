@@ -21,9 +21,15 @@
                     <h5 class="mb-0">Target URL</h5>
                 </div>
                 <div class="card-body">
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <input type="url" id="targetUrl" class="form-control" placeholder="https://example.com" aria-label="Website URL">
                         <button class="btn btn-primary" type="button" onclick="handleUrl()">Set URL</button>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('html_elements')">Test HTML Elements</button>
+                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('broken_links')">Test Broken Links</button>
+                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('seo_tags')">Test SEO Tags</button>
+                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('security_headers')">Test Security Headers</button>
                     </div>
                 </div>
             </div>
@@ -76,7 +82,7 @@
             const response = await fetch(`${apiEndpoint}?action=list`);
             const data = await response.json();
             
-            csrfToken = data.csrf_token; // Store the token from API
+            csrfToken = data.csrf_token;
             const tests = data.tests;
             const tbody = document.querySelector('#testTable tbody');
             tbody.innerHTML = '';
@@ -140,11 +146,41 @@
         }
     }
 
+    async function runWebTest(testType) {
+        const url = document.getElementById('targetUrl').value;
+        if (!url) {
+            log('Please enter a URL first', 'danger');
+            return;
+        }
+
+        log(`Running web scan: ${testType}...`);
+        const formData = new FormData();
+        formData.append('url', url);
+        formData.append('test_type', testType);
+        formData.append('csrf_token', csrfToken);
+
+        try {
+            const response = await fetch(`${apiEndpoint}?action=scan`, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.error) {
+                log('Error: ' + result.error, 'danger');
+            } else {
+                log(`Scan Result: ${result.message}`, result.status);
+            }
+        } catch (err) {
+            log('Error executing scan: ' + err.message, 'danger');
+        }
+    }
+
     async function runTest(testId) {
         log(`Running test ID: ${testId}...`);
         const formData = new FormData();
         formData.append('test_id', testId);
-        formData.append('csrf_token', csrfToken); // Send the CSRF token
+        formData.append('csrf_token', csrfToken);
 
         try {
             const response = await fetch(`${apiEndpoint}?action=run`, {
@@ -157,7 +193,7 @@
                 log('Error: ' + result.error, 'danger');
             } else {
                 log(`Test result: ${result.status.toUpperCase()} - ${result.message}`, result.status);
-                fetchTests(); // Refresh the list
+                fetchTests();
             }
         } catch (err) {
             log('Error executing test: ' + err.message, 'danger');

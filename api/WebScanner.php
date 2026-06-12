@@ -126,4 +126,120 @@ class WebScanner {
 
         return "Security Headers present: " . implode(', ', $found);
     }
+
+    public function testPerformance() {
+        $start = microtime(true);
+        list(, $code) = $this->fetchHtml();
+        $end = microtime(true);
+        $duration = round($end - $start, 3);
+        return "Response time: {$duration} seconds";
+    }
+
+    public function testAccessibility() {
+        list($html) = $this->fetchHtml();
+        $results = [];
+        
+        $images = preg_match_all('/<img[^>]+>/i', $html, $imgMatches);
+        $missingAlt = 0;
+        if ($images > 0) {
+            foreach ($imgMatches[0] as $img) {
+                if (stripos($img, 'alt=') === false) {
+                    $missingAlt++;
+                }
+            }
+        }
+        $results[] = "Images: $images, Missing alt: $missingAlt";
+
+        if (preg_match('/<meta name="viewport" content="[^"]*width=[^"]*scale=[^"]*"/i', $html)) {
+            $results[] = "Viewport meta: Present";
+        } else {
+            $results[] = "Viewport meta: Missing";
+        }
+
+        return "Accessibility: " . implode(' | ', $results);
+    }
+
+    public function testMobileView() {
+        $ch = curl_init($this->url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1');
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $html = curl_exec($ch);
+        curl_close($ch);
+
+        if (preg_match('/<meta name="viewport" content="[^"]*width=[^"]*"/i', $html)) {
+            return "Mobile View: Viewport meta present";
+        }
+        return "Mobile View: Viewport meta missing";
+    }
+
+    public function testCookies() {
+        $ch = curl_init($this->url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $headers = substr($response, 0, $headerSize);
+        curl_close($ch);
+
+        preg_match_all('/Set-Cookie:\s*([^;]*)/i', $headers, $matches);
+        $cookies = $matches[1] ?? [];
+
+        if (empty($cookies)) {
+            return "No cookies set by the server.";
+        }
+
+        return "Cookies found: " . count($cookies) . " (" . implode(', ', array_slice($cookies, 0, 3)) . (count($cookies) > 3 ? '...' : '') . ")";
+    }
+
+    public function testHttpsRedirect() {
+        $ch = curl_init($this->url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_exec($ch);
+        $effectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        curl_close($ch);
+
+        if (strpos($effectiveUrl, 'https://') === 0) {
+            return "HTTPS Redirect: Active ($effectiveUrl)";
+        }
+        return "HTTPS Redirect: Inactive (Currently using $effectiveUrl)";
+    }
+
+    public function testSitemap() {
+        $urlParts = parse_url($this->url);
+        $base = $urlParts['scheme'] . '://' . $urlParts['host'] . '/';
+        $sitemaps = ['sitemap.xml', 'sitemap_index.xml'];
+        $found = [];
+
+        $ch = curl_init($base . 'robots.txt');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        $robots = curl_exec($ch);
+        curl_close($ch);
+
+        if (preg_match('/Sitemap:\s*(https?:\/\/[^\s]+)/i', $robots, $matches)) {
+            $found[] = "Found in robots.txt: " . trim($matches[1]);
+        }
+
+        foreach ($sitemaps as $sitemap) {
+            $ch = curl_init($base . $sitemap);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if ($code === 200) {
+                $found[] = "Directly accessible: $sitemap";
+            }
+        }
+
+        return empty($found) ? "No sitemap found." : "Sitemap: " . implode(' | ', array_unique($found));
+    }
 }

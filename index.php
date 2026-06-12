@@ -30,6 +30,12 @@
                         <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('broken_links')">Test Broken Links</button>
                         <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('seo_tags')">Test SEO Tags</button>
                         <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('security_headers')">Test Security Headers</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('performance')">Test Performance</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('accessibility')">Test Accessibility</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('mobile_view')">Test Mobile View</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('cookies')">Test Cookies</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('https_redirect')">Test HTTPS Redirect</button>
+                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('sitemap')">Test Sitemap</button>
                     </div>
                 </div>
             </div>

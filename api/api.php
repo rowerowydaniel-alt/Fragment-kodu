@@ -138,8 +138,28 @@ if ($action === 'scan') {
             case 'security_headers':
                 $resultMessage = $scanner->testSecurityHeaders();
                 break;
+            case 'performance':
+                $resultMessage = $scanner->testPerformance();
+                break;
+            case 'accessibility':
+                $resultMessage = $scanner->testAccessibility();
+                break;
+            case 'mobile_view':
+                $resultMessage = $scanner->testMobileView();
+                break;
+            case 'cookies':
+                $resultMessage = $scanner->testCookies();
+                break;
+            case 'https_redirect':
+                $resultMessage = $scanner->testHttpsRedirect();
+                break;
+            case 'sitemap':
+                $resultMessage = $scanner->testSitemap();
+                break;
             default:
                 throw new Exception("Unknown scan type: $testType");
+        }
+
         }
     } catch (Exception $e) {
         $resultStatus = 'failed';

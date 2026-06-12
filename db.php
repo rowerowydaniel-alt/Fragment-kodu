@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db   = 'unittest';
 $user = 'unittest';
-$pass = 'WNeOj[gAvSJJ22ai'; // Standard Laragon default
+$pass = 'WNeOj[gAvSJJ22ai';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

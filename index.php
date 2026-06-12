@@ -216,5 +216,11 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="mt-5 py-3 bg-white text-center border-top">
+    <div class="container">
+        <p class="mb-1">&copy; 2026 Unit Testing App</p>
+        <p class="mb-0">Author: <a href="https://github.com/rowerowydaniel-alt/Unit_Testing_App" target="_blank" class="text-decoration-none">rowerowydaniel-alt</a></p>
+    </div>
+</footer>
 </body>
 </html>

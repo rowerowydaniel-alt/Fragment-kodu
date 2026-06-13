@@ -132,6 +132,18 @@ try {
 
         try {
             switch ($testType) {
+                case 'readability':
+                    $resultMessage = $scanner->testReadability();
+                    break;
+                case 'image_optimization':
+                    $resultMessage = $scanner->testImageOptimization();
+                    break;
+                case 'broken_forms':
+                    $resultMessage = $scanner->testBrokenForms();
+                    break;
+                case 'external_scripts':
+                    $resultMessage = $scanner->testExternalScripts();
+                    break;
                 case 'html_elements':
                     $resultMessage = $scanner->testHtmlElements();
                     break;

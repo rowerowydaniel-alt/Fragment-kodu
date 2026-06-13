@@ -242,4 +242,82 @@ class WebScanner {
 
         return empty($found) ? "No sitemap found." : "Sitemap: " . implode(' | ', array_unique($found));
     }
+
+    public function testReadability() {
+        list($html) = $this->fetchHtml();
+        $hasH1 = preg_match('/<h1/i', $html);
+        $pCount = preg_match_all('/<p/i', $html);
+        
+        $result = "H1 present: " . ($hasH1 ? 'Yes' : 'No');
+        if ($pCount > 0) {
+            $result .= " | Paragraphs found: $pCount";
+        } else {
+            $result .= " | No paragraphs found";
+        }
+        return $result;
+    }
+
+    public function testImageOptimization() {
+        list($html) = $this->fetchHtml();
+        $imgCount = preg_match_all('/<img/i', $html, $imgMatches);
+        $missingAltCount = 0;
+
+        if ($imgCount > 0) {
+            foreach ($imgMatches[0] as $img) {
+                if (stripos($img, 'alt=') === false) {
+                    $missingAltCount++;
+                }
+            }
+            $result = "Images: $imgCount, Missing alt: $missingAltCount";
+            if ($missingAltCount > 0) {
+                $result .= " (Needs improvement)";
+            }
+        } else {
+            $result = "No images found.";
+        }
+        return $result;
+    }
+
+    public function testBrokenForms() {
+        list($html) = $this->fetchHtml();
+        $formCount = preg_match_all('/<form/i', $html);
+        
+        if ($formCount === 0) {
+            return "No forms found.";
+        }
+
+        preg_match_all('/<form[^>]*>(.*?)<\/form>/is', $html, $formMatches);
+        $brokenForms = 0;
+        $totalForms = count($formMatches[1]);
+
+        foreach ($formMatches[1] as $formContent) {
+            if (preg_match('/<input|<textarea|<select/i', $formContent) === 0) {
+                $brokenForms++;
+            }
+        }
+
+        $result = "Forms found: $totalForms, Empty forms: $brokenForms";
+        if ($brokenForms > 0) {
+            $result .= " (Check empty forms)";
+        }
+        return $result;
+    }
+
+    public function testExternalScripts() {
+        list($html) = $this->fetchHtml();
+        $domain = parse_url($this->url, PHP_URL_HOST);
+        
+        preg_match_all('/<script[^>]+src=["\']([^"\']+)["\'][^>]*>/i', $html, $matches);
+        $externalScripts = 0;
+        $scriptUrls = $matches[1] ?? [];
+
+        foreach ($scriptUrls as $scriptUrl) {
+            $scriptHost = parse_url($scriptUrl, PHP_URL_HOST);
+            if ($scriptHost && $scriptHost !== $domain) {
+                $externalScripts++;
+            }
+        }
+
+        return "External scripts: $externalScripts out of " . count($scriptUrls) . " total scripts.";
+    }
 }

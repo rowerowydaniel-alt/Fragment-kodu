@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple PHP Unit Test Runner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .status-passed { color: green; font-weight: bold; }
-        .status-failed { color: red; font-weight: bold; }
-        .card { margin-bottom: 20px; }
-    </style>
+<style>
+    .status-passed { color: green; font-weight: bold; }
+    .status-failed { color: red; font-weight: bold; }
+    .card { margin-bottom: 20px; }
+    div#consoleLog { max-height: 488px; }
+</style>
 </head>
 <body class="bg-light">
 
@@ -25,18 +26,22 @@
                         <input type="url" id="targetUrl" class="form-control" placeholder="https://example.com" aria-label="Website URL">
                         <button class="btn btn-primary" type="button" onclick="handleUrl()">Set URL</button>
                     </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('html_elements')">Test HTML Elements</button>
-                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('broken_links')">Test Broken Links</button>
-                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('seo_tags')">Test SEO Tags</button>
-                        <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('security_headers')">Test Security Headers</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('performance')">Test Performance</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('accessibility')">Test Accessibility</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('mobile_view')">Test Mobile View</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('cookies')">Test Cookies</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('https_redirect')">Test HTTPS Redirect</button>
-                        <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('sitemap')">Test Sitemap</button>
-                    </div>
+<div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('html_elements')">Test HTML Elements</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('broken_links')">Test Broken Links</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('seo_tags')">Test SEO Tags</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('security_headers')">Test Security Headers</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('readability')">Test Readability</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('image_optimization')">Test Image Optimization</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('broken_forms')">Test Broken Forms</button>
+    <button class="btn btn-sm btn-info text-white" type="button" onclick="runWebTest('external_scripts')">Test External Scripts</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('performance')">Test Performance</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('accessibility')">Test Accessibility</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('mobile_view')">Test Mobile View</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('cookies')">Test Cookies</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('https_redirect')">Test HTTPS Redirect</button>
+    <button class="btn btn-sm btn-secondary text-white" type="button" onclick="runWebTest('sitemap')">Test Sitemap</button>
+</div>
                 </div>
             </div>
         </div>
@@ -68,7 +73,7 @@
         </div>
         <div class="col-md-8">
                 
-                <div class="card-body bg-dark text-white" id="consoleLog" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
+                <div class="card-body bg-dark text-white" id="consoleLog" style="overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
                     <div>System ready...</div>
                 </div></div>
             </div>

@@ -20,6 +20,8 @@ header("Content-Security-Policy:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple PHP Unit Test Runner</title>
+    <meta name="description" content="Simple PHP Unit Test Runner — lightweight tool for running and analyzing PHP unit tests directly in the browser.">
+    <meta name="robots" content="index, follow">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     .status-passed { color: green; font-weight: bold; }
@@ -34,6 +36,9 @@ header("Content-Security-Policy:
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="mb-0 text-center">Simple PHP Unit Test Runner</h1>
+                </div>
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">Target URL</h5>
                 </div>
